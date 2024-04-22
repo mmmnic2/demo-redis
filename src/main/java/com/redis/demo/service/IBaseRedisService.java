@@ -9,6 +9,9 @@ import java.util.Set;
 
 public interface IBaseRedisService {
     void set(String key, String value);
+    void set(String key, int value);
+    void setIfAbend(String key, int value);
+    Long increase(String key);
     void setTimeToLive(String key, long timeoutInDays);
     void hashSet(String key, String field, Object value);
     boolean hashExists(String key, String field);

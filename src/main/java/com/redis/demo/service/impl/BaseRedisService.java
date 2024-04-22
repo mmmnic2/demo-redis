@@ -26,6 +26,19 @@ public class BaseRedisService implements IBaseRedisService {
     public void set(String key, String value) {
         redisTemplate.opsForValue().set(key, value);
     }
+    public void set(String key, int value) {
+        redisTemplate.opsForValue().set(key, value);
+    }
+
+    @Override
+    public void setIfAbend(String key, int value) {
+        redisTemplate.opsForValue().setIfAbsent(key, value);
+    }
+
+    @Override
+    public Long increase(String key) {
+        return redisTemplate.opsForValue().increment(key);
+    }
 
     @Override
     public void setTimeToLive(String key, long timeoutInDays) {

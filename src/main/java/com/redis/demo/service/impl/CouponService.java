@@ -2,20 +2,26 @@ package com.redis.demo.service.impl;
 
 import com.redis.demo.dto.CouponResponse;
 import com.redis.demo.entity.Coupon;
+import com.redis.demo.exception.NotFoundException;
 import com.redis.demo.repository.CouponRepository;
+import com.redis.demo.service.IBaseRedisService;
 import com.redis.demo.service.ICouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CouponService implements ICouponService {
     @Autowired
-    private RedisTemplate<Object, Object> redisTemplate;
+    RedisTemplate<String, Object> redisTemplate;
     @Autowired
     CouponRepository couponRepository;
+    @Autowired
+    IBaseRedisService baseRedisService;
+
     @Override
     public List<CouponResponse> getAllCoupons() {
         List<Coupon> couponList = couponRepository.findAll();
@@ -27,11 +33,40 @@ public class CouponService implements ICouponService {
 
     @Override
     public CouponResponse findCouponById(Long id) {
-        return null;
+        Coupon coupon = couponRepository.findById(id).orElseThrow(() -> new NotFoundException("not found" + id));
+        return coupon.toCouponResponse();
     }
 
     @Override
     public CouponResponse saveCoupon(CouponResponse couponResponse) {
-        return null;
+        Coupon coupon = couponRepository.save(toCoupon(couponResponse));
+        return coupon.toCouponResponse();
+    }
+
+
+    @Override
+    public Long applyCoupon(Long couponId) {
+        Coupon coupon = couponRepository.findById(couponId).orElseThrow(() -> new NotFoundException("not found" + couponId));
+        int count = coupon.getUsageCount();
+        int limit = coupon.getUsageLimit();
+        String key = CouponRedisService.COUPON_PREFIX + couponId;
+        String temp = String.valueOf(redisTemplate.hasKey(key));
+
+        if(temp == null){
+            baseRedisService.setIfAbend(key, count);
+        }
+        int countUser = Math.toIntExact(baseRedisService.increase(key));
+        if(countUser > limit){
+            throw new NotFoundException("Coupon has reached its usage limit.");
+        }
+
+        return 100L;
+    }
+    private Coupon toCoupon(CouponResponse couponResponse){
+        Coupon coupon = new Coupon();
+        coupon.setCouponCode(couponResponse.getCouponCode());
+        coupon.setUsageCount(couponResponse.getUsageCount());
+        coupon.setUsageLimit(couponResponse.getUsageLimit());
+        return coupon;
     }
 }
