@@ -8,5 +8,6 @@ public interface ICouponService {
     List<CouponResponse> getAllCoupons();
     CouponResponse findCouponById(Long id);
     CouponResponse saveCoupon(CouponResponse couponResponse);
-    Long applyCoupon(Long couponId);
+    CouponResponse applyCoupon(Long couponId);
+
 }

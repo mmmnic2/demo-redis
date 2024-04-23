@@ -45,23 +45,26 @@ public class CouponService implements ICouponService {
 
 
     @Override
-    public Long applyCoupon(Long couponId) {
+    public CouponResponse applyCoupon(Long couponId) {
         Coupon coupon = couponRepository.findById(couponId).orElseThrow(() -> new NotFoundException("not found" + couponId));
         int count = coupon.getUsageCount();
         int limit = coupon.getUsageLimit();
         String key = CouponRedisService.COUPON_PREFIX + couponId;
-        String temp = String.valueOf(redisTemplate.hasKey(key));
-
-        if(temp == null){
-            baseRedisService.setIfAbend(key, count);
+        Boolean temp = redisTemplate.hasKey(key);
+        if(Boolean.FALSE.equals(temp)){
+            baseRedisService.set(key, count);
         }
         int countUser = Math.toIntExact(baseRedisService.increase(key));
         if(countUser > limit){
             throw new NotFoundException("Coupon has reached its usage limit.");
         }
-
-        return 100L;
+        System.out.println("so luong coupon da dung: " + countUser );
+        coupon.setUsageCount(countUser);
+        return couponRepository.save(coupon).toCouponResponse();
     }
+
+
+
     private Coupon toCoupon(CouponResponse couponResponse){
         Coupon coupon = new Coupon();
         coupon.setCouponCode(couponResponse.getCouponCode());

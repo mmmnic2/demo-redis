@@ -7,6 +7,7 @@ import com.redis.demo.dto.CouponResponse;
 import com.redis.demo.service.IBaseRedisService;
 import com.redis.demo.service.ICouponRedisService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +18,8 @@ public class CouponRedisService implements ICouponRedisService {
     IBaseRedisService baseRedisService;
     @Autowired
     ObjectMapper redisObjectMapper;
+    @Autowired
+    RedisTemplate<String, Object> redisTemplate;
     public static final String COUPON_PREFIX = "coupon";
     public static final String COUPON_PREFIX_GET = "get";
 
@@ -39,6 +42,9 @@ public class CouponRedisService implements ICouponRedisService {
         String json = redisObjectMapper.writeValueAsString(couponResponseList);
         baseRedisService.set(key, json);
     }
-
+    @Override
+    public void clear() {
+        redisTemplate.getConnectionFactory().getConnection().flushAll();
+    }
 
 }

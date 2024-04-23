@@ -2,6 +2,7 @@ package com.redis.demo.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.redis.demo.dto.CouponResponse;
+import com.redis.demo.exception.NotFoundException;
 import com.redis.demo.service.ICouponRedisService;
 import com.redis.demo.service.ICouponService;
 import com.redis.demo.service.impl.CouponRedisService;
@@ -37,5 +38,14 @@ public class CouponController {
     public ResponseEntity<?> save(@RequestBody CouponResponse couponResponse) {
         CouponResponse couponResponse1 = couponService.saveCoupon(couponResponse);
         return ResponseEntity.status(HttpStatus.CREATED).body(couponResponse1);
+    }
+    @GetMapping("/apply-coupon/{id}")
+    public ResponseEntity<?> applyCoupon(@PathVariable Long id){
+        try{
+            CouponResponse couponResponse = couponService.applyCoupon(id);
+            return ResponseEntity.ok(couponResponse);
+        }catch (NotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 }

@@ -8,6 +8,7 @@ import java.util.List;
 
 
 public interface ICouponRedisService {
+    void clear();
 
     List<CouponResponse> getAllCoupons(String key) throws JsonProcessingException;
     void saveCoupon(String key, CouponResponse couponResponse) throws JsonProcessingException;
