@@ -51,21 +51,34 @@ public class CouponService implements ICouponService {
         int limit = coupon.getUsageLimit();
         String key = CouponRedisService.COUPON_PREFIX + couponId;
         Boolean temp = redisTemplate.hasKey(key);
-        if(Boolean.FALSE.equals(temp)){
+        if (Boolean.FALSE.equals(temp)) {
             baseRedisService.set(key, count);
         }
         int countUser = Math.toIntExact(baseRedisService.increase(key));
-        if(countUser > limit){
+        if (countUser > limit) {
             throw new NotFoundException("Coupon has reached its usage limit.");
         }
-        System.out.println("so luong coupon da dung: " + countUser );
+        System.out.println("so luong coupon da dung: " + countUser);
         coupon.setUsageCount(countUser);
         return couponRepository.save(coupon).toCouponResponse();
     }
 
+    @Override
+    public CouponResponse removeCoupon(Long couponId) {
+        Coupon coupon = couponRepository.findById(couponId).orElseThrow(() -> new NotFoundException("not found: " + couponId));
+        String key = CouponRedisService.COUPON_PREFIX + couponId;
+        int count = coupon.getUsageCount();
+        Boolean temp = redisTemplate.hasKey(key);
+        if (Boolean.FALSE.equals(temp)) {
+            baseRedisService.set(key, count);
+        }
+        count = (int) baseRedisService.get(key) > coupon.getUsageLimit() ? coupon.getUsageLimit() : Math.toIntExact(redisTemplate.opsForValue().decrement(key));
+        coupon.setUsageCount(count);
+        return couponRepository.save(coupon).toCouponResponse();
+    }
 
 
-    private Coupon toCoupon(CouponResponse couponResponse){
+    private Coupon toCoupon(CouponResponse couponResponse) {
         Coupon coupon = new Coupon();
         coupon.setCouponCode(couponResponse.getCouponCode());
         coupon.setUsageCount(couponResponse.getUsageCount());

@@ -8,11 +8,14 @@ import com.redis.demo.service.IBaseRedisService;
 import com.redis.demo.service.ICouponRedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@EnableScheduling
 public class CouponRedisService implements ICouponRedisService {
     @Autowired
     IBaseRedisService baseRedisService;
@@ -46,5 +49,9 @@ public class CouponRedisService implements ICouponRedisService {
     public void clear() {
         redisTemplate.getConnectionFactory().getConnection().flushAll();
     }
-
+    // clear cache every 2 minutes
+    @Scheduled(fixedRate = 120000)
+    public void clearCache(){
+        clear();
+    }
 }

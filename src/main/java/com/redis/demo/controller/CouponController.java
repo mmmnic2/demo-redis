@@ -48,4 +48,13 @@ public class CouponController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+    @GetMapping("/remove-coupon/{id}")
+    public ResponseEntity<?> removeCoupon(@PathVariable Long id){
+        try {
+            CouponResponse couponResponse = couponService.removeCoupon(id);
+            return ResponseEntity.ok(couponResponse);
+        }catch (NotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 }

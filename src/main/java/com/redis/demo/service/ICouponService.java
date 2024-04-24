@@ -9,5 +9,5 @@ public interface ICouponService {
     CouponResponse findCouponById(Long id);
     CouponResponse saveCoupon(CouponResponse couponResponse);
     CouponResponse applyCoupon(Long couponId);
-
+    CouponResponse removeCoupon(Long couponId);
 }

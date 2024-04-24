@@ -19,7 +19,6 @@ public class CouponListener {
 
     @PostPersist
     public void postPersist(Coupon coupon) {
-        baseRedisService.delete(CouponRedisService.COUPON_PREFIX + coupon.getCouponCode());
         baseRedisService.delete(CouponRedisService.COUPON_PREFIX+CouponRedisService.COUPON_PREFIX_GET);
     }
 
