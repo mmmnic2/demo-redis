@@ -1,7 +1,6 @@
 package com.redis.demo.service.impl;
 
 import com.redis.demo.service.IBaseRedisService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -26,8 +25,9 @@ public class BaseRedisService implements IBaseRedisService {
     public void set(String key, String value) {
         redisTemplate.opsForValue().set(key, value);
     }
-    public void set(String key, int value) {
+    public int set(String key, int value) {
         redisTemplate.opsForValue().set(key, value);
+        return value;
     }
 
     @Override

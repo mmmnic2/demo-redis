@@ -24,6 +24,7 @@ public class CouponService implements ICouponService {
 
     @Override
     public List<CouponResponse> getAllCoupons() {
+        System.out.println("Ham duoc goi");
         List<Coupon> couponList = couponRepository.findAll();
         return couponList.stream()
                 .map(Coupon::toCouponResponse)
@@ -72,7 +73,8 @@ public class CouponService implements ICouponService {
         if (Boolean.FALSE.equals(temp)) {
             baseRedisService.set(key, count);
         }
-        count = (int) baseRedisService.get(key) > coupon.getUsageLimit() ? coupon.getUsageLimit() : Math.toIntExact(redisTemplate.opsForValue().decrement(key));
+        count = (int) baseRedisService.get(key) > coupon.getUsageLimit() ?
+                baseRedisService.set(key, coupon.getUsageLimit() - 1) : Math.toIntExact(redisTemplate.opsForValue().decrement(key));
         coupon.setUsageCount(count);
         return couponRepository.save(coupon).toCouponResponse();
     }

@@ -1,7 +1,5 @@
 package com.redis.demo.service;
 
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,7 +7,7 @@ import java.util.Set;
 
 public interface IBaseRedisService {
     void set(String key, String value);
-    void set(String key, int value);
+    int set(String key, int value);
     void setIfAbend(String key, int value);
     Long increase(String key);
     void setTimeToLive(String key, long timeoutInDays);
